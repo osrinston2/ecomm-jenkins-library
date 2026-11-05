@@ -15,11 +15,8 @@ def call() {
 
     // 2. Build image using Podman
     bat '''
-        set "APPDATA=C:\\Users\\rinst\\AppData\\Roaming"
-        set "PATH=C:\\Users\\rinst\\AppData\\Local\\Programs\\Podman;%PATH%"
-
-        "C:\\Users\\rinst\\AppData\\Local\\Programs\\Podman\\podman.exe" build ^
-            -t "%IMAGE_NAME%:%IMAGE_TAG%" .
+        podman version
+        podman build -t "%IMAGE_NAME%:%IMAGE_TAG%" .
     '''
 
     echo "Successfully built image: ${image}"

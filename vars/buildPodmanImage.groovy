@@ -15,7 +15,6 @@ def call() {
 
     // 2. Build image using Podman
     bat '''
-        set "APPDATA=C:\\Users\\rinst\\AppData\\Roaming"
         podman version
         podman build -t "%IMAGE_NAME%:%IMAGE_TAG%" .
     '''

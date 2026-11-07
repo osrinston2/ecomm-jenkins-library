@@ -2,15 +2,22 @@
 def call() {
 
     // Get Git repository URL
-    def remoteUrl = bat(
-        script: '@git config --get remote.origin.url',
-        returnStdout: true
-    ).trim()
+    def remoteUrl
+    if (isUnix()) {
+        remoteUrl = sh(
+            script: 'git config --get remote.origin.url',
+            returnStdout: true
+        ).trim()
+    } else {
+        remoteUrl = bat(
+            script: '@git config --get remote.origin.url',
+            returnStdout: true
+        ).trim()
+    }
 
     if (!remoteUrl) {
         error('Unable to determine Git repository URL.')
     }
-
     // Extract repository name
     def normalizedUrl = remoteUrl
         .replace('\\', '/')
@@ -29,20 +36,24 @@ def call() {
     // Determine current branch
     def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
 
-    if (!branch || branch == 'HEAD') {
-        branch = bat(
-            script: '@git branch --show-current',
-            returnStdout: true
-        ).trim()
-    }
-
     if (!branch) {
-        error('Unable to determine Git branch.')
+        if (isUnix()) {
+            branch = sh(
+                script: 'git branch --show-current',
+                returnStdout: true
+            ).trim()
+        } else {
+            branch = bat(
+                script: '@git branch --show-current',
+                returnStdout: true
+            ).trim()
+        }
     }
 
     // Normalize branch name
     branch = branch
         .replaceFirst(/^refs\/heads\//, '')
+        .replaceFirst(/^refs\/remotes\/origin\//, '')
         .replaceFirst(/^origin\//, '')
         .toLowerCase()
         .replaceAll(/[^a-z0-9_.-]+/, '-')
